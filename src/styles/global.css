@@ -29,3 +29,8 @@ a { color: var(--color-primaryText); }
   .page-header { flex-direction: column; align-items: stretch; gap: 8px; }
   .page-title { font-size: 18px; }
 }
+
+/* GL-24 / SC 2.4.7：全站 focus-visible 兜底 2px 焦点环（MASTER §5 唯一让步条款）。
+   为什么用 :focus-visible 而不是 :focus：鼠标点击不该出现环，键盘/读屏必须可见；
+   任何页面禁止 outline: none（已核对全仓无此写法）。 */
+:focus-visible { outline: 2px solid var(--color-focusRing); outline-offset: 2px; }

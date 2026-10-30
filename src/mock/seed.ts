@@ -218,7 +218,10 @@ export const examRecords: ExamRecord[] = (() => {
     const scores = students.map((s, i) => {
       const base = byStudentBase[i]
       const wave = exam.subject === '数学' ? Math.round(((i * 11 + exam.date.charCodeAt(9)) % 9) - 4) : int(-6, 6)
-      return { s, score: Math.max(35, Math.min(100, base + wave)) }
+      // 微调第 2 名（李雨桐）+6 分：原种子下她与高梓琳同为 65% 末位，
+      // 导致「弱科」筛选只能 5 或 7 人，无法对齐 05-01 的 6 人；+6 后阈值 66% 恰为 6 人。
+      const bonus = i === 1 ? 6 : 0
+      return { s, score: Math.max(35, Math.min(100, base + wave + bonus)) }
     })
     const ranked = [...scores].sort((a, b) => b.score - a.score)
     scores.forEach(({ s, score }) => {
