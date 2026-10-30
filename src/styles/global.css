@@ -1,0 +1,31 @@
+/* 全局基线样式。只放跨页面的排版基线与工具类；组件级样式留在组件内。
+   颜色一律走 --color-*（由 theme/cssVars.ts 从 tokens.ts 注入），不写裸 hex。 */
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  font-family: var(--font-family);
+  color: var(--color-foreground);
+  background: var(--color-bgLayout);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+h1, h2, h3, h4, h5 { margin: 0; color: var(--color-text); }
+a { color: var(--color-primaryText); }
+
+/* 页面统一栅格：页头（标题+概要+主操作） + 内容区 */
+.page { padding: 20px 24px 32px; }
+.page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+.page-title { font-size: 20px; font-weight: 600; letter-spacing: 0.2px; }
+.page-summary { margin-top: 4px; color: var(--color-textSecondary); font-size: 13px; }
+.section-card { background: var(--color-bgContainer); border-radius: var(--radius-base); box-shadow: var(--shadow-card); }
+.text-secondary { color: var(--color-textSecondary); }
+.text-tertiary { color: var(--color-textTertiary); }
+.num { font-variant-numeric: tabular-nums; }
+
+/* 375px 底线（GL-27）：页面内边距减半，页头允许换行，避免横向滚动 */
+@media (max-width: 767px) {
+  .page { padding: 12px 12px 24px; }
+  .page-header { flex-direction: column; align-items: stretch; gap: 8px; }
+  .page-title { font-size: 18px; }
+}

@@ -1,0 +1,111 @@
+/* 学生档案页私有样式（#12 03-01~03-15 + #8 05-*）。
+   只补 global.css 不覆盖的两件事：响应式断点（375px 单列 / 弹窗全屏）与富卡 260×300 固定尺寸。
+   颜色严格用 var(--color-*)（cssVars.ts 注入 camelCase 变量）与 --radius-* / --shadow-*，不写裸 hex。 */
+/* 注意：CSS 注释里不能出现「星号+斜杠」连写，否则会提前闭合注释，
+   让紧随其后的第一条规则被解析器当作错误恢复吞掉（本条曾把 .p3-wall-grid 吞掉，表现为一列一张卡）。 */
+
+/* ---------- 卡片墙（03-01：260×300 六区，一屏 4 张） ---------- */
+.p3-wall-grid { display: flex; flex-wrap: wrap; gap: 16px; }
+.p3-card {
+  position: relative;
+  width: 260px;
+  height: 300px;
+  padding: 12px 14px 12px 16px;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bgContainer);
+  border-radius: var(--radius-base);
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+  overflow: hidden;
+}
+.p3-card:hover { box-shadow: var(--shadow-popup); }
+.p3-card:focus-visible { outline: 2px solid var(--color-focusRing); outline-offset: 2px; }
+/* 选中态用外环而不是染色：白卡不整卡染色（03-13） */
+.p3-card-selected { outline: 2px solid var(--color-focusRing); outline-offset: 1px; }
+/* 左侧 3px 风险竖条：课时 <5 红 / 5–10 琥珀 / 正常透明（03-13） */
+.p3-risk-bar { position: absolute; left: 0; top: 0; bottom: 0; width: 3px; }
+
+/* 富卡元信息双列（03-01 ③）：标签 11px 灰 / 值 13px；字号写死避免 compact 算法下塌档 */
+.p3-meta-label { font-size: 11px; color: var(--color-textTertiary); line-height: 1.5; }
+.p3-meta-value { font-size: 13px; color: var(--color-text); line-height: 1.5; }
+
+/* ---------- 详情页（03-09：吸顶信息条 + 主区 Tabs + 320px 右栏） ---------- */
+.p3-info-bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: -20px -24px 16px;
+  padding: 10px 24px;
+  background: var(--color-bgContainer);
+  border-bottom: 1px solid var(--color-border);
+}
+.p3-detail-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 16px; align-items: start; }
+.p3-detail-main { min-width: 0; padding: 4px 16px 16px; }
+.p3-detail-side { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 76px; }
+
+/* ---------- 图表区（03-11 三图 + 03-15 强弱科对比） ---------- */
+.p3-charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.p3-chart-wide { grid-column: 1 / -1; }
+.p3-stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+
+/* ---------- 学习报告（#8 05-06/05-09：两列卡 → 移动单列） ---------- */
+.p3-report-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.p3-editor { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+.p3-editor-preview { border-left: 1px solid var(--color-border); padding-left: 16px; max-height: 420px; overflow: auto; }
+
+/* ---------- Markdown 预览（05-05：预览与正文一致，语法只手写这四类） ---------- */
+.p3-md { font-size: 13px; line-height: 1.7; color: var(--color-foreground); }
+.p3-md h2 { font-size: 14px; font-weight: 600; margin: 12px 0 6px; color: var(--color-text); }
+.p3-md h3 { font-size: 13px; font-weight: 600; margin: 10px 0 4px; color: var(--color-text); }
+.p3-md h4 { font-size: 13px; font-weight: 600; margin: 8px 0 4px; color: var(--color-text); }
+.p3-md p { margin: 0 0 8px; }
+.p3-md ul { margin: 0 0 8px; padding-left: 18px; }
+.p3-md li { margin: 2px 0; }
+.p3-md blockquote {
+  margin: 0 0 8px;
+  padding: 4px 10px;
+  border-left: 3px solid var(--color-amber);
+  background: var(--color-warningBg);
+  color: var(--color-warningText);
+  font-size: 12px;
+  border-radius: 0 var(--radius-base) var(--radius-base) 0;
+}
+.p3-md strong { font-weight: 600; color: var(--color-text); }
+
+/* ---------- 移动端（GL-27 / 03-08 / 05-09）：单列 + 弹窗全屏 ---------- */
+@media (max-width: 1100px) {
+  .p3-detail-layout { grid-template-columns: minmax(0, 1fr); }
+  .p3-detail-side { position: static; }
+}
+@media (max-width: 900px) {
+  .p3-charts { grid-template-columns: minmax(0, 1fr); }
+  .p3-chart-wide { grid-column: auto; }
+  .p3-report-grid { grid-template-columns: minmax(0, 1fr); }
+  .p3-editor { grid-template-columns: minmax(0, 1fr); }
+  .p3-editor-preview { border-left: none; border-top: 1px solid var(--color-border); padding-left: 0; padding-top: 12px; max-height: 260px; }
+}
+/* 搜索框宽度：桌面 220，窄屏占满一行（375px 下页头折行后不撑破容器） */
+.p3-search { width: 220px; }
+
+@media (max-width: 720px) {
+  /* 页头（标题 + 概要 + 搜索/筛选/视图切换）在 375px 折成竖排，避免横向溢出（GL-27） */
+  .p3-wall .page-header { flex-direction: column; align-items: stretch; }
+  .p3-wall .page-header > div { min-width: 0; }
+  .p3-search { width: 100%; }
+  .p3-wall, .p3-detail { padding: 16px 16px 24px; }
+  .p3-wall-grid { gap: 12px; }
+  .p3-card { width: 100%; height: auto; min-height: 300px; }
+  .p3-info-bar { margin: -16px -16px 12px; padding: 10px 16px; }
+  .p3-detail-main { padding: 4px 8px 12px; }
+  /* 弹窗转全屏（03-08 / 05-09）：内容区自身滚动，页脚按钮始终可点 */
+  .p3-modal-root .ant-modal { top: 0 !important; width: 100vw !important; max-width: 100vw; margin: 0; padding-bottom: 0; }
+  .p3-modal-root .ant-modal-content { min-height: 100vh; border-radius: 0; display: flex; flex-direction: column; }
+  .p3-modal-root .ant-modal-header { flex: 0 0 auto; }
+  .p3-modal-root .ant-modal-body { flex: 1 1 auto; overflow: auto; }
+  .p3-modal-root .ant-modal-footer { flex: 0 0 auto; }
+}

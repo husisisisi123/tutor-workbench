@@ -1,0 +1,47 @@
+/* 反馈页私有样式（只放行内样式不适合表达的部分）。
+   颜色全部由行内样式从 theme/tokens.ts 取值或引用 --color-* 变量，本文件不写色值（DS-1）。 */
+
+.fb-card {
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+.fb-card:hover {
+  transform: translateY(-1px);
+}
+
+/* 拖拽反馈：被拖卡片半透明、可落区域虚线描边，两个状态都不靠颜色唯一表达（SC 1.4.1）。 */
+.fb-dragging {
+  opacity: 0.45;
+}
+.fb-drop-target {
+  outline: 2px dashed currentColor;
+  outline-offset: -2px;
+}
+
+/* 焦点可见性兜底（SC 2.4.7 / MASTER §5 让步条款）：2px 外环、currentColor 保证 ≥4.5:1，
+   不用 outline: none。卡片是可点区域，键盘与读屏都要能定位。 */
+.fb-focusable:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* 编辑画板在 240px 未入座边栏 + 7 列 140px 卡片时可用宽度不足，
+   只在画板内部横向滚动，页面整体不横滚（GL-26）；卡片 140px 下限优先（02-01）。 */
+.fb-wall-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 4px;
+}
+
+/* 弹窗左右两栏各自滚动，底栏固定不动（02-11）。 */
+.fb-pane {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* 移动端抽屉/弹窗全屏时，隐藏浏览器滚动条带来的横向抖动。 */
+.fb-mobile-modal {
+  max-width: 100vw !important;
+  margin: 0 !important;
+  top: 0 !important;
+  padding-bottom: 0 !important;
+}

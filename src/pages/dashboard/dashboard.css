@@ -1,0 +1,435 @@
+/* 首页看板（#6）页面私有样式。
+   为什么单独一份 CSS 而不是全内联：2×2 栅格 + 320px 右栏 + 「hover/focus 才出现的挂件按钮」
+   + 375px 断点都靠媒体查询/伪类表达，内联样式写不出来（01-08 / 01-11）。
+   颜色纪律：本文件不写裸 hex，只用 var(--dash-*)；--dash-* 是页内语义别名，
+   值单一来源是 tokens 注入的 --color-*（theme/cssVars.ts，camelCase，已与全站统一）。
+   多做这一层是为了页面内只用“卡片底/正文色/边框”这类语义名，避免同一行里混用十几个 --color-*。 */
+.dashboard {
+  --dash-primary: var(--color-primary);
+  --dash-primaryText: var(--color-primaryText);
+  --dash-primaryBg: var(--color-primaryBg);
+  --dash-onPrimary: var(--color-onPrimary);
+  --dash-bgLayout: var(--color-bgLayout);
+  --dash-bgContainer: var(--color-bgContainer);
+  --dash-bgHover: var(--color-bgHover);
+  --dash-border: var(--color-border);
+  --dash-borderStrong: var(--color-borderStrong);
+  --dash-text: var(--color-text);
+  --dash-textSecondary: var(--color-textSecondary);
+  --dash-textTertiary: var(--color-textTertiary);
+  --dash-foreground: var(--color-foreground);
+  --dash-icon: var(--color-icon);
+  --dash-focusRing: var(--color-focusRing);
+  --dash-error: var(--color-error);
+  --dash-errorText: var(--color-errorText);
+  --dash-errorBg: var(--color-errorBg);
+  --dash-warning: var(--color-warning);
+  --dash-warningText: var(--color-warningText);
+  --dash-warningBg: var(--color-warningBg);
+  --dash-successText: var(--color-successText);
+  --dash-successBg: var(--color-successBg);
+
+  /* 顶栏 56px（AppLayout），背景要铺满内容区剩余高度，否则预设渐变只包住卡片区 */
+  min-height: calc(100vh - 56px);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+/* 页头放在白卡里：上传图可能偏暗，标题直接压在图上会掉对比度（§1.1 按最坏底校准） */
+.db-headband {
+  background: var(--dash-bgContainer);
+  border: 1px solid var(--dash-border);
+  border-radius: var(--radius-base);
+  box-shadow: var(--shadow-card);
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  min-width: 0;
+}
+.db-headband .page-header { margin-bottom: 0; }
+.db-summary { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; font-size: 13px; }
+.db-summary b { font-weight: 600; color: var(--dash-text); font-variant-numeric: tabular-nums; }
+.db-summary__dot { color: var(--dash-borderStrong); }
+
+/* 主区：左 2×2 内容块 + 右 320px 挂件列（01-01） */
+.db-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 16px;
+  align-items: start;
+  min-width: 0;
+}
+.db-blocks {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  min-width: 0;
+}
+
+/* —— 四块内容统一外壳：标题行 + 3 条 + 一行汇总（01-02） —— */
+.db-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--dash-bgContainer);
+  border: 1px solid var(--dash-border);
+  border-radius: var(--radius-base);
+  box-shadow: var(--shadow-card);
+}
+.db-card__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--dash-border);
+}
+.db-card__icon { display: flex; color: var(--dash-primaryText); font-size: 16px; }
+.db-card__title { font-size: 14px; font-weight: 600; color: var(--dash-text); margin: 0; }
+.db-card__badge {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: var(--dash-bgHover);
+  color: var(--dash-textSecondary);
+  font-size: 12px;
+  line-height: 20px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.db-card__extra { margin-left: auto; }
+.db-card__body { flex: 1; padding: 6px; min-width: 0; }
+.db-card__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 14px 10px;
+  border-top: 1px solid var(--dash-border);
+  font-size: 12px;
+  color: var(--dash-textTertiary);
+}
+.db-card__foot b { color: var(--dash-textSecondary); font-weight: 600; }
+
+/* 行：用 button 而不是 div，键盘 Enter/Space 原生可点（SC 2.1.1）；reset 掉默认按钮样式 */
+.db-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 7px 8px;
+  border: 0;
+  border-radius: var(--radius-base);
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+  min-width: 0;
+}
+.db-row:hover { background: var(--dash-bgHover); }
+.db-row:focus-visible { outline: 2px solid var(--dash-focusRing); outline-offset: 1px; }
+.db-row__main { flex: 1; min-width: 0; }
+.db-row__title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--dash-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.db-row__meta {
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--dash-textTertiary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.db-row__detail {
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px dashed var(--dash-border);
+  font-size: 12px;
+  color: var(--dash-textSecondary);
+  white-space: normal;
+}
+.db-row__time {
+  flex: 0 0 40px;
+  font-size: 12px;
+  color: var(--dash-textSecondary);
+  font-variant-numeric: tabular-nums;
+}
+.db-row__arrow { flex: 0 0 auto; color: var(--dash-textTertiary); font-size: 11px; }
+.db-row--open { background: var(--dash-bgHover); }
+.db-empty { padding: 18px 8px; text-align: center; font-size: 12px; color: var(--dash-textTertiary); }
+
+/* 未读计数徽标：红底白字只是「非唯一手段」的一半，旁边必须有「N 条未读」文字（DS-6） */
+.db-unread {
+  flex: 0 0 auto;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--dash-error);
+  color: var(--dash-bgContainer);
+  font-size: 11px;
+  line-height: 18px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.db-muted { flex: 0 0 auto; font-size: 12px; color: var(--dash-textTertiary); }
+.db-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--dash-warning); display: inline-block; flex: 0 0 auto; }
+
+/* —— 右栏 320px 挂件列（01-01/01-08） —— */
+.db-rail { display: flex; flex-direction: column; gap: 12px; width: 320px; min-width: 0; }
+.db-rail__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2px;
+  font-size: 12px;
+  color: var(--dash-textTertiary);
+}
+.db-widget {
+  min-width: 0;
+  background: var(--dash-bgContainer);
+  border: 1px solid var(--dash-border);
+  border-radius: var(--radius-base);
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.15s ease;
+}
+.db-widget--dragging { opacity: 0.55; }
+.db-widget--over { box-shadow: 0 0 0 2px var(--dash-primary); }
+.db-widget__head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px 6px 10px;
+  cursor: grab;
+}
+.db-widget__head:active { cursor: grabbing; }
+.db-widget__grip { display: flex; color: var(--dash-textTertiary); font-size: 12px; }
+.db-widget__name { font-size: 12px; font-weight: 600; color: var(--dash-textSecondary); letter-spacing: 0.2px; }
+.db-widget__ctrls {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  /* 桌面只在 hover/focus-within 显示，二者必须是同一组按钮（Q4=C：DnD 不可键盘操作，按钮是 a11y 补救） */
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+.db-widget:hover .db-widget__ctrls,
+.db-widget:focus-within .db-widget__ctrls { opacity: 1; }
+/* 触屏没有 hover：按钮常显，移动端升降可用（01-11） */
+@media (hover: none) {
+  .db-widget__ctrls { opacity: 1; }
+}
+.db-widget__body { padding: 0 12px 12px; min-width: 0; }
+
+/* 24×24 目标：图标按钮不小于 SC 2.5.8 的 24×24（GL-23） */
+.db-iconbtn {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--dash-icon);
+  font-size: 12px;
+  cursor: pointer;
+}
+.db-iconbtn:hover:not(:disabled) { background: var(--dash-bgHover); color: var(--dash-text); }
+.db-iconbtn:focus-visible { outline: 2px solid var(--dash-focusRing); outline-offset: 1px; }
+.db-iconbtn:disabled { opacity: 0.35; cursor: default; }
+
+.db-clock__time { font-size: 26px; font-weight: 600; color: var(--dash-text); letter-spacing: 0.5px; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.db-clock__date { margin-top: 2px; font-size: 12px; color: var(--dash-textSecondary); }
+.db-clock__term { margin-top: 6px; font-size: 12px; color: var(--dash-textTertiary); }
+
+.db-weather__main { display: flex; align-items: baseline; gap: 8px; }
+.db-weather__temp { font-size: 26px; font-weight: 600; color: var(--dash-text); font-variant-numeric: tabular-nums; }
+.db-weather__cond { font-size: 13px; color: var(--dash-textSecondary); }
+.db-weather__grid {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px 8px;
+  font-size: 12px;
+  color: var(--dash-textTertiary);
+}
+
+.db-news { list-style: none; margin: 0; padding: 0; }
+.db-news li { display: flex; align-items: baseline; gap: 6px; padding: 4px 0; font-size: 12px; color: var(--dash-textSecondary); min-width: 0; }
+.db-news__tag { flex: 0 0 auto; padding: 0 4px; border-radius: 3px; background: var(--dash-primaryBg); color: var(--dash-primaryText); font-size: 11px; }
+.db-news__text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.db-news__meta { flex: 0 0 auto; margin-left: auto; color: var(--dash-textTertiary); font-size: 11px; }
+
+.db-links { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.db-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 4px 6px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-base);
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+  min-width: 0;
+}
+.db-link:hover { background: var(--dash-bgHover); }
+.db-link:focus-visible { outline: 2px solid var(--dash-focusRing); outline-offset: 1px; }
+.db-link__icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  font-weight: 600;
+}
+.db-link__icon--brand { background: var(--dash-primaryBg); color: var(--dash-primaryText); }
+.db-link__name { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; color: var(--dash-textSecondary); }
+.db-link--invalid .db-link__name { color: var(--dash-errorText); }
+.db-rail-empty { padding: 14px 12px; font-size: 12px; color: var(--dash-textTertiary); text-align: center; }
+
+/* —— 自定义抽屉（01-03/01-04/01-05/01-09） —— */
+.db-cfg { display: flex; flex-direction: column; gap: 14px; }
+.db-cfg__label { font-size: 12px; font-weight: 600; color: var(--dash-textSecondary); }
+.db-preset-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.db-preset {
+  position: relative;
+  height: 74px;
+  border: 1px solid var(--dash-border);
+  border-radius: var(--radius-base);
+  font: inherit;
+  cursor: pointer;
+  overflow: hidden;
+}
+.db-preset:focus-visible { outline: 2px solid var(--dash-focusRing); outline-offset: 2px; }
+.db-preset--active { border-color: var(--dash-primary); box-shadow: 0 0 0 1px var(--dash-primary); }
+.db-preset__name {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: var(--dash-bgContainer);
+  color: var(--dash-text);
+  font-size: 12px;
+}
+.db-preset__check {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--dash-bgContainer);
+  color: var(--dash-primaryText);
+  font-size: 11px;
+}
+.db-cfg__actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.db-bg-preview { position: relative; border-radius: var(--radius-base); overflow: hidden; border: 1px solid var(--dash-border); }
+.db-bg-preview img { display: block; width: 100%; height: 96px; object-fit: cover; }
+.db-bg-preview span { position: absolute; left: 8px; bottom: 8px; padding: 1px 6px; border-radius: 3px; background: var(--dash-bgContainer); color: var(--dash-textSecondary); font-size: 11px; }
+.db-hint { margin: 0; font-size: 12px; line-height: 1.5; color: var(--dash-textTertiary); }
+.db-hint--warn { color: var(--dash-warningText); }
+
+.db-cfg-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--dash-border);
+  border-radius: var(--radius-base);
+  min-width: 0;
+}
+.db-cfg-row + .db-cfg-row { margin-top: 8px; }
+.db-cfg-row__name { flex: 1; min-width: 0; font-size: 13px; color: var(--dash-text); }
+.db-cfg-row__hint { font-size: 11px; color: var(--dash-textTertiary); }
+.db-cfg-row--hidden .db-cfg-row__name { color: var(--dash-textTertiary); }
+.db-cfg-row__grip { color: var(--dash-textTertiary); font-size: 12px; display: flex; }
+
+.db-link-row { display: flex; align-items: flex-start; gap: 6px; }
+.db-link-row + .db-link-row { margin-top: 10px; }
+.db-link-row__fields { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.db-link-row__err { font-size: 11px; color: var(--dash-errorText); }
+
+/* —— 家长互动抽屉（#13）：按学生聚合、平铺消息、底部假回复 —— */
+.db-parent-tabs {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--dash-border);
+}
+.db-parent-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px 3px 3px;
+  border: 1px solid var(--dash-border);
+  border-radius: 999px;
+  background: var(--dash-bgContainer);
+  font: inherit;
+  font-size: 12px;
+  color: var(--dash-textSecondary);
+  cursor: pointer;
+  flex: 0 0 auto;
+  min-height: 32px;
+}
+.db-parent-tabs::-webkit-scrollbar { display: none; }
+.db-parent-tab:hover { background: var(--dash-bgHover); }
+.db-parent-tab:focus-visible { outline: 2px solid var(--dash-focusRing); outline-offset: 1px; }
+.db-parent-tab--active { border-color: var(--dash-primary); background: var(--dash-primaryBg); color: var(--dash-primaryText); }
+.db-parent-body { flex: 1; overflow-y: auto; padding: 12px 16px 16px; min-height: 0; }
+.db-msg-group + .db-msg-group { margin-top: 16px; }
+.db-msg-group__head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  color: var(--dash-textTertiary);
+}
+.db-msg-group__head::after { content: ''; flex: 1; height: 1px; background: var(--dash-border); }
+.db-msg { display: flex; flex-direction: column; max-width: 88%; margin-bottom: 10px; }
+.db-msg--parent { align-items: flex-start; }
+.db-msg--teacher { align-items: flex-end; margin-left: auto; }
+.db-msg__bubble { padding: 7px 10px; border-radius: 8px; font-size: 13px; line-height: 1.5; color: var(--dash-text); background: var(--dash-bgHover); word-break: break-word; }
+.db-msg--teacher .db-msg__bubble { background: var(--dash-primaryBg); color: var(--dash-primaryText); }
+.db-msg__time { margin-top: 4px; font-size: 11px; color: var(--dash-textTertiary); }
+.db-composer { flex: 0 0 auto; border-top: 1px solid var(--dash-border); padding: 10px 16px 14px; background: var(--dash-bgContainer); }
+.db-composer__hint { margin-bottom: 6px; font-size: 11px; color: var(--dash-textTertiary); }
+.db-composer__row { display: flex; align-items: flex-end; gap: 8px; }
+.db-composer__row > :first-child { flex: 1; min-width: 0; }
+.db-drawer-sub { font-size: 12px; color: var(--dash-textTertiary); }
+
+/* —— 断点（01-11）：<1280 右栏转为两列并落到内容下方；<768 全部单列、抽屉全屏 —— */
+@media (max-width: 1279px) {
+  .db-main { grid-template-columns: minmax(0, 1fr); }
+  .db-rail { width: auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .db-rail__head { grid-column: 1 / -1; }
+}
+@media (max-width: 767px) {
+  .dashboard { padding: 12px 12px 24px; }
+  .db-headband { padding: 12px; }
+  .db-main, .db-blocks, .db-rail { grid-template-columns: minmax(0, 1fr); }
+  .db-rail__head { grid-column: auto; }
+  .db-weather__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .db-msg { max-width: 94%; }
+  /* 375 验收是宽度断点：有的设备模拟器不上报 hover:none，这里再按宽度兜底显示升降按钮（01-11） */
+  .db-widget__ctrls { opacity: 1; }
+}
